@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "0vGDe+sP7b4cEj4KDdFX2/gAR9ZliO1YKE4J/BOzl9k=",
+  "Source": "TrafficViolationsAPI",
+  "BasePath": "_content/TrafficViolationsAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
