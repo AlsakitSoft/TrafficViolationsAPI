@@ -665,17 +665,7 @@ namespace TrafficViolationsAPI.Controllers
             return User.FindFirst("UserType")?.Value ?? "";
         }
 
-        //private Guid GetCurrentUserId()
-        //{
-        //    // مؤقتًا: إعادة معرف ثابت لمستخدم وهمي أثناء الاختبار
-        //    return Guid.Parse("11111111-1111-1111-1111-111111111111");
-        //}
-
-        //private string GetCurrentUserType()
-        //{
-        //    // مؤقتًا: إعادة نوع مستخدم وهمي
-        //    return "Admin"; // أو "TrafficOfficer" حسب ما تريد اختباره
-        //}
+        
     }
 }
 
