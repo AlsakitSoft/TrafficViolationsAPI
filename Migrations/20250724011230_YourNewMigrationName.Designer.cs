@@ -12,8 +12,8 @@ using TrafficViolationsAPI.Data;
 namespace TrafficViolationsAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250716212129_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250724011230_YourNewMigrationName")]
+    partial class YourNewMigrationName
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -153,72 +153,68 @@ namespace TrafficViolationsAPI.Migrations
 
             modelBuilder.Entity("TrafficViolationsAPI.Models.Violation", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Violation_ID")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("Created_At")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("EvidenceImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("FineAmount")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<Guid>("OfficerId")
+                    b.Property<Guid>("Created_By_User_ID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("PaymentDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Dividing")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Plate_Number")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Plate_Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Pending");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<Guid>("VehicleId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.Property<Guid?>("VehicleId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasIndex("OfficerId");
+                    b.Property<string>("Violation_Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Violation_Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Violation_Type_ID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Violation_ID");
+
+                    b.HasIndex("Created_By_User_ID");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("VehicleId");
+
+                    b.HasIndex("Violation_Type_ID");
 
                     b.ToTable("Violations");
                 });
 
             modelBuilder.Entity("TrafficViolationsAPI.Models.ViolationType", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("Violation_Type_ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -230,14 +226,8 @@ namespace TrafficViolationsAPI.Migrations
                     b.Property<decimal>("DefaultFineAmount")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -249,64 +239,13 @@ namespace TrafficViolationsAPI.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Violation_Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasKey("Violation_Type_ID");
 
                     b.ToTable("ViolationTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("1f651cee-51f9-4b00-bd8e-f2f13bd2a1b3"),
-                            CreatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9047),
-                            DefaultFineAmount = 300.00m,
-                            Description = "تجاوز الحد الأقصى للسرعة المسموح بها",
-                            IsActive = true,
-                            Name = "تجاوز السرعة المحددة",
-                            UpdatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9048)
-                        },
-                        new
-                        {
-                            Id = new Guid("1dcfcf94-e9e8-4edb-b38b-737767f25d2c"),
-                            CreatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9051),
-                            DefaultFineAmount = 150.00m,
-                            Description = "عدم استخدام حزام الأمان أثناء القيادة",
-                            IsActive = true,
-                            Name = "عدم ربط حزام الأمان",
-                            UpdatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9051)
-                        },
-                        new
-                        {
-                            Id = new Guid("5b19ff63-8d78-45a5-9e50-1c689075a4c5"),
-                            CreatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9053),
-                            DefaultFineAmount = 500.00m,
-                            Description = "استخدام الهاتف المحمول أثناء قيادة المركبة",
-                            IsActive = true,
-                            Name = "استخدام الهاتف أثناء القيادة",
-                            UpdatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9054)
-                        },
-                        new
-                        {
-                            Id = new Guid("2ba63307-157f-401f-9416-ac957bbaf4c6"),
-                            CreatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9056),
-                            DefaultFineAmount = 1000.00m,
-                            Description = "تجاوز الإشارة الضوئية الحمراء",
-                            IsActive = true,
-                            Name = "عدم التوقف عند الإشارة الحمراء",
-                            UpdatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9056)
-                        },
-                        new
-                        {
-                            Id = new Guid("c0d2783c-415b-4bf0-94f0-dcacd1a7b0c7"),
-                            CreatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9061),
-                            DefaultFineAmount = 200.00m,
-                            Description = "إيقاف المركبة في مكان غير مسموح",
-                            IsActive = true,
-                            Name = "الوقوف في مكان ممنوع",
-                            UpdatedAt = new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9061)
-                        });
                 });
 
             modelBuilder.Entity("TrafficViolationsAPI.Models.Vehicle", b =>
@@ -322,21 +261,29 @@ namespace TrafficViolationsAPI.Migrations
 
             modelBuilder.Entity("TrafficViolationsAPI.Models.Violation", b =>
                 {
-                    b.HasOne("TrafficViolationsAPI.Models.User", "Officer")
+                    b.HasOne("TrafficViolationsAPI.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("Created_By_User_ID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TrafficViolationsAPI.Models.User", null)
                         .WithMany("ViolationsIssued")
-                        .HasForeignKey("OfficerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
-                    b.HasOne("TrafficViolationsAPI.Models.Vehicle", "Vehicle")
+                    b.HasOne("TrafficViolationsAPI.Models.Vehicle", null)
                         .WithMany("Violations")
-                        .HasForeignKey("VehicleId")
+                        .HasForeignKey("VehicleId");
+
+                    b.HasOne("TrafficViolationsAPI.Models.ViolationType", "ViolationType")
+                        .WithMany()
+                        .HasForeignKey("Violation_Type_ID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Officer");
+                    b.Navigation("CreatedByUser");
 
-                    b.Navigation("Vehicle");
+                    b.Navigation("ViolationType");
                 });
 
             modelBuilder.Entity("TrafficViolationsAPI.Models.User", b =>

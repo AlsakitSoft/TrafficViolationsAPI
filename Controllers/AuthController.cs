@@ -24,6 +24,47 @@ namespace TrafficViolationsAPI.Controllers
             _configuration = configuration;
         }
 
+        //[HttpPost("login")]
+        //public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
+        //{
+        //    string hashedPassword = BCrypt.Net.BCrypt.HashPassword("123456");
+        //    Console.WriteLine(hashedPassword);
+
+        //    try
+        //    {
+        //        var user = await _context.Users
+        //            .FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.IsActive);
+
+        //        if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+        //        {
+        //            return Unauthorized(new { message = "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
+        //        }
+
+        //        var token = GenerateJwtToken(user);
+
+        //        var userDto = new UserDto
+        //        {
+        //            Id = user.Id,
+        //            Name = user.Name,
+        //            NationalId = user.NationalId,
+        //            Email = user.Email,
+        //            PhoneNumber = user.PhoneNumber,
+        //            UserType = user.UserType,
+        //            IsActive = user.IsActive,
+        //            CreatedAt = user.CreatedAt
+        //        };
+
+        //        return Ok(new LoginResponseDto
+        //        {
+        //            Token = token,
+        //            User = userDto
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { message = "حدث خطأ أثناء تسجيل الدخول", error = ex.Message });
+        //    }
+        //}
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
         {
@@ -32,7 +73,18 @@ namespace TrafficViolationsAPI.Controllers
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.IsActive);
 
-                if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+                // تحقق أولاً أن المستخدم موجود
+                if (user == null)
+                {
+                    Console.WriteLine("❌ المستخدم غير موجود");
+                    return Unauthorized(new { message = "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
+                }
+
+                // اطبع الهش من قاعدة البيانات لأغراض التحقق
+                Console.WriteLine($"Hash from DB: {user.PasswordHash}");
+                Console.WriteLine($"Password match: {BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash)}");
+
+                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 {
                     return Unauthorized(new { message = "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
                 }
@@ -62,6 +114,7 @@ namespace TrafficViolationsAPI.Controllers
                 return StatusCode(500, new { message = "حدث خطأ أثناء تسجيل الدخول", error = ex.Message });
             }
         }
+
 
         [HttpPost("register")]
         public async Task<ActionResult<LoginResponseDto>> Register(CreateUserDto createUserDto)

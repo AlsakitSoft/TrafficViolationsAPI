@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TrafficViolationsAPI.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class YourNewMigrationName : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,17 +33,17 @@ namespace TrafficViolationsAPI.Migrations
                 name: "ViolationTypes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Violation_Type_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Violation_Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     DefaultFineAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ViolationTypes", x => x.Id);
+                    table.PrimaryKey("PK_ViolationTypes", x => x.Violation_Type_ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -78,47 +78,44 @@ namespace TrafficViolationsAPI.Migrations
                 name: "Violations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Location = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FineAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Pending"),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    VehicleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OfficerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EvidenceImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    Violation_ID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Violation_Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Violation_Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Plate_Number = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Plate_Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Dividing = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Violation_Type_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Created_By_User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Created_At = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    VehicleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Violations", x => x.Id);
+                    table.PrimaryKey("PK_Violations", x => x.Violation_ID);
                     table.ForeignKey(
-                        name: "FK_Violations_Users_OfficerId",
-                        column: x => x.OfficerId,
+                        name: "FK_Violations_Users_Created_By_User_ID",
+                        column: x => x.Created_By_User_ID,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_Violations_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Violations_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
-                        principalColumn: "Id",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Violations_ViolationTypes_Violation_Type_ID",
+                        column: x => x.Violation_Type_ID,
+                        principalTable: "ViolationTypes",
+                        principalColumn: "Violation_Type_ID",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.InsertData(
-                table: "ViolationTypes",
-                columns: new[] { "Id", "CreatedAt", "DefaultFineAmount", "Description", "IsActive", "Name", "UpdatedAt" },
-                values: new object[,]
-                {
-                    { new Guid("1dcfcf94-e9e8-4edb-b38b-737767f25d2c"), new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9051), 150.00m, "عدم استخدام حزام الأمان أثناء القيادة", true, "عدم ربط حزام الأمان", new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9051) },
-                    { new Guid("1f651cee-51f9-4b00-bd8e-f2f13bd2a1b3"), new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9047), 300.00m, "تجاوز الحد الأقصى للسرعة المسموح بها", true, "تجاوز السرعة المحددة", new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9048) },
-                    { new Guid("2ba63307-157f-401f-9416-ac957bbaf4c6"), new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9056), 1000.00m, "تجاوز الإشارة الضوئية الحمراء", true, "عدم التوقف عند الإشارة الحمراء", new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9056) },
-                    { new Guid("5b19ff63-8d78-45a5-9e50-1c689075a4c5"), new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9053), 500.00m, "استخدام الهاتف المحمول أثناء قيادة المركبة", true, "استخدام الهاتف أثناء القيادة", new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9054) },
-                    { new Guid("c0d2783c-415b-4bf0-94f0-dcacd1a7b0c7"), new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9061), 200.00m, "إيقاف المركبة في مكان غير مسموح", true, "الوقوف في مكان ممنوع", new DateTime(2025, 7, 16, 21, 21, 28, 871, DateTimeKind.Utc).AddTicks(9061) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -145,9 +142,14 @@ namespace TrafficViolationsAPI.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Violations_OfficerId",
+                name: "IX_Violations_Created_By_User_ID",
                 table: "Violations",
-                column: "OfficerId");
+                column: "Created_By_User_ID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Violations_UserId",
+                table: "Violations",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Violations_VehicleId",
@@ -155,10 +157,9 @@ namespace TrafficViolationsAPI.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ViolationTypes_Name",
-                table: "ViolationTypes",
-                column: "Name",
-                unique: true);
+                name: "IX_Violations_Violation_Type_ID",
+                table: "Violations",
+                column: "Violation_Type_ID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -167,10 +168,10 @@ namespace TrafficViolationsAPI.Migrations
                 name: "Violations");
 
             migrationBuilder.DropTable(
-                name: "ViolationTypes");
+                name: "Vehicles");
 
             migrationBuilder.DropTable(
-                name: "Vehicles");
+                name: "ViolationTypes");
 
             migrationBuilder.DropTable(
                 name: "Users");

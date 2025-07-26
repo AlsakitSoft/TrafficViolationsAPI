@@ -10,7 +10,7 @@ namespace TrafficViolationsAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class VehiclesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +22,7 @@ namespace TrafficViolationsAPI.Controllers
 
         // GET: api/vehicles - جلب جميع المركبات
         [HttpGet]
-        [Authorize(Policy = "TrafficOfficerOrAdmin")]
+      //  [Authorize(Policy = "TrafficOfficerOrAdmin")]
         public async Task<ActionResult<List<VehicleDto>>> GetVehicles(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
@@ -83,7 +83,9 @@ namespace TrafficViolationsAPI.Controllers
                 // Allow access if user owns the vehicle or is traffic officer/admin
                 if (vehicle.OwnerId != currentUserId && currentUserType != "TrafficOfficer" && currentUserType != "Admin")
                 {
-                    return Forbid("غير مخول للوصول لهذه البيانات");
+                    //return Forbid("غير مخول للوصول لهذه البيانات");
+                    return Forbid("Bearer");
+
                 }
 
                 var vehicleDto = MapToVehicleDto(vehicle);
@@ -107,7 +109,9 @@ namespace TrafficViolationsAPI.Controllers
                 // Allow access if user is requesting their own vehicles or if user is traffic officer/admin
                 if (currentUserId != userId && currentUserType != "TrafficOfficer" && currentUserType != "Admin")
                 {
-                    return Forbid("غير مخول للوصول لهذه البيانات");
+                    // return Forbid("غير مخول للوصول لهذه البيانات");
+                    return Forbid("Bearer");
+
                 }
 
                 var vehicles = await _context.Vehicles
@@ -218,7 +222,9 @@ namespace TrafficViolationsAPI.Controllers
                 // Allow update if user owns the vehicle or is traffic officer/admin
                 if (vehicle.OwnerId != currentUserId && currentUserType != "TrafficOfficer" && currentUserType != "Admin")
                 {
-                    return Forbid("غير مخول لتحديث هذه المركبة");
+                    // return Forbid("غير مخول لتحديث هذه المركبة");
+                    return Forbid("Bearer");
+
                 }
 
                 // Check if new plate number conflicts with existing vehicles
@@ -265,7 +271,9 @@ namespace TrafficViolationsAPI.Controllers
                 // Allow deletion if user owns the vehicle or is traffic officer/admin
                 if (vehicle.OwnerId != currentUserId && currentUserType != "TrafficOfficer" && currentUserType != "Admin")
                 {
-                    return Forbid("غير مخول لحذف هذه المركبة");
+                    //return Forbid("غير مخول لحذف هذه المركبة");
+                    return Forbid("Bearer");
+
                 }
 
                 // Soft delete - just mark as inactive
@@ -321,6 +329,17 @@ namespace TrafficViolationsAPI.Controllers
         {
             return User.FindFirst("UserType")?.Value ?? "";
         }
+        //private Guid GetCurrentUserId()
+        //{
+        //    // مؤقتًا: إعادة معرف ثابت لمستخدم وهمي أثناء الاختبار
+        //    return Guid.Parse("11111111-1111-1111-1111-111111111111");
+        //}
+
+        //private string GetCurrentUserType()
+        //{
+        //    // مؤقتًا: إعادة نوع مستخدم وهمي
+        //    return "Admin"; // أو "TrafficOfficer" حسب ما تريد اختباره
+        //}
     }
 }
 

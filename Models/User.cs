@@ -35,13 +35,12 @@ namespace TrafficViolationsAPI.Models
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation Properties
         public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 
-        [InverseProperty("Officer")]
+        [InverseProperty("CreatedByUser")]
         public virtual ICollection<Violation> ViolationsIssued { get; set; } = new List<Violation>();
     }
 }

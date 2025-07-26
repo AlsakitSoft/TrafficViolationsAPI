@@ -10,7 +10,7 @@ namespace TrafficViolationsAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+   // [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +22,7 @@ namespace TrafficViolationsAPI.Controllers
 
         // GET: api/users - جلب جميع المستخدمين (للمشرفين فقط)
         [HttpGet]
-        [Authorize(Policy = "TrafficOfficerOrAdmin")]
+       // [Authorize(Policy = "TrafficOfficerOrAdmin")]
         public async Task<ActionResult<List<UserDto>>> GetUsers(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
@@ -75,7 +75,9 @@ namespace TrafficViolationsAPI.Controllers
                 // Allow access if user is requesting their own data or if user is traffic officer/admin
                 if (currentUserId != id && currentUserType != "TrafficOfficer" && currentUserType != "Admin")
                 {
-                    return Forbid("غير مخول للوصول لهذه البيانات");
+                    //return Forbid("غير مخول للوصول لهذه البيانات");
+                    return Forbid("Bearer");
+
                 }
 
                 var user = await _context.Users.FindAsync(id);
@@ -118,7 +120,7 @@ namespace TrafficViolationsAPI.Controllers
 
         // GET: api/users/national-id/{nationalId} - البحث بواسطة رقم الهوية
         [HttpGet("national-id/{nationalId}")]
-        [Authorize(Policy = "TrafficOfficerOrAdmin")]
+        //[Authorize(Policy = "TrafficOfficerOrAdmin")]
         public async Task<ActionResult<UserDto>> GetUserByNationalId(string nationalId)
         {
             try
@@ -152,7 +154,9 @@ namespace TrafficViolationsAPI.Controllers
                 // Allow update if user is updating their own data or if user is admin
                 if (currentUserId != id && currentUserType != "Admin")
                 {
-                    return Forbid("غير مخول لتحديث هذه البيانات");
+                    // return Forbid("غير مخول لتحديث هذه البيانات");
+                    return Forbid("Bearer");
+
                 }
 
                 var user = await _context.Users.FindAsync(id);
@@ -199,7 +203,7 @@ namespace TrafficViolationsAPI.Controllers
 
         // DELETE: api/users/{id} - حذف مستخدم (إلغاء تفعيل)
         [HttpDelete("{id}")]
-        [Authorize(Policy = "TrafficOfficerOrAdmin")]
+       // [Authorize(Policy = "TrafficOfficerOrAdmin")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             try
@@ -226,7 +230,7 @@ namespace TrafficViolationsAPI.Controllers
 
         // GET: api/users/statistics - إحصائيات المستخدمين
         [HttpGet("statistics")]
-        [Authorize(Policy = "TrafficOfficerOrAdmin")]
+       // [Authorize(Policy = "TrafficOfficerOrAdmin")]
         public async Task<ActionResult<object>> GetUserStatistics()
         {
             try
@@ -279,6 +283,17 @@ namespace TrafficViolationsAPI.Controllers
         {
             return User.FindFirst("UserType")?.Value ?? "";
         }
+        //private Guid GetCurrentUserId()
+        //{
+        //    // مؤقتًا: إعادة معرف ثابت لمستخدم وهمي أثناء الاختبار
+        //    return Guid.Parse("11111111-1111-1111-1111-111111111111");
+        //}
+
+        //private string GetCurrentUserType()
+        //{
+        //    // مؤقتًا: إعادة نوع مستخدم وهمي
+        //    return "Admin"; // أو "TrafficOfficer" حسب ما تريد اختباره
+        //}
     }
 
     public class UpdateUserDto
