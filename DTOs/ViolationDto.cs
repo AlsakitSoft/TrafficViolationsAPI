@@ -123,6 +123,27 @@ namespace TrafficViolationsAPI.DTOs
         public bool IsSynced { get; set; }
     }
 
+    public class UpdateViolationDto
+    {
+        // لا نسمح بتغيير رقم اللوحة أو المُنشئ
+        // نركز فقط على الحقول القابلة للتعديل
+
+        public string? Violation_Note { get; set; }
+
+        [Required]
+        public string? Violation_Location { get; set; }
+        //[Required]
+        //public string Plate_Type { get; set; }
+        [Required]
+        public string Plate_Number { get; set; }
+        [Required]
+        public Guid Violation_Type_ID { get; set; }
+
+        //public string? Notes { get; set; }
+
+        // يمكن إضافة حقول أخرى إذا كانت قابلة للتعديل
+    }
+
     public class UpdateViolationStatusDto
     {
         [Required]

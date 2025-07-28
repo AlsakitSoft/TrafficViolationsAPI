@@ -390,7 +390,8 @@ namespace TrafficViolationsAPI.Controllers
                     // Created_At = createViolationDto.Created_At,
                    //Created_By_User_ID = GetCurrentUserId(),
                     Created_By_User_ID = officerId,
-                    Created_At = DateTime.UtcNow,
+                   // Created_At = DateTime.UtcNow,
+                    Created_At = createViolationDto.Created_At,
                 //Notes = createViolationDto.Notes,
                 //ImagePath = createViolationDto.ImagePath,
                 //IsSynced = createViolationDto.IsSynced
@@ -422,6 +423,83 @@ namespace TrafficViolationsAPI.Controllers
 }
 
         }
+
+        // --- ✅ Endpoint جديد: PUT api/violations/{id} ---
+        [HttpPut("{id}")]
+        [Authorize(Policy = "TrafficOfficerOnly")]
+        public async Task<IActionResult> UpdateViolation(string id, UpdateViolationDto updateDto)
+        {
+            var officerId = GetCurrentUserId();
+            var violation = await _context.Violations.FindAsync(id);
+
+            if (violation == null)
+            {
+                return NotFound(new { message = "المخالفة غير موجودة" });
+            }
+
+            // التحقق من الصلاحية: هل هذا الضابط هو من أنشأ المخالفة؟
+            if (violation.Created_By_User_ID != officerId)
+            {
+                return Forbid(); // 403 Forbidden - ليس لديك صلاحية
+            }
+
+            // تحديث الحقول
+            violation.Violation_Note = updateDto.Violation_Note;
+            violation.Violation_Location = updateDto.Violation_Location;
+            violation.Plate_Number = updateDto.Plate_Number;
+            //violation.Plate_Type = updateDto.Plate_Type;
+
+            violation.Violation_Type_ID = updateDto.Violation_Type_ID;
+           // violation.Notes = updateDto.Notes;
+            // يمكنك إضافة حقول أخرى هنا
+
+            _context.Entry(violation).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Violations.Any(e => e.Violation_ID == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent(); // 204 No Content - تم التحديث بنجاح
+        }
+        // --- ✅ Endpoint جديد: DELETE api/violations/{id} ---
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "TrafficOfficerOrAdmin")] // الضابط أو المشرف يمكنه الحذف
+        public async Task<IActionResult> DeleteViolation(string id)
+        {
+            var officerId = GetCurrentUserId();
+            var userType = GetCurrentUserType();
+            var violation = await _context.Violations.FindAsync(id);
+
+            if (violation == null)
+            {
+                // إذا كانت غير موجودة، نعتبر أن الحذف نجح لتجنب مشاكل المزامنة
+                return NoContent();
+            }
+
+            // التحقق من الصلاحية: هل هو نفس الضابط أو مشرف؟
+            if (violation.Created_By_User_ID != officerId && userType != "Admin")
+            {
+                return Forbid();
+            }
+
+            _context.Violations.Remove(violation);
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // 204 No Content - تم الحذف بنجاح
+        }
+
 
         // GET: api/violations/{id} - جلب مخالفة محددة
         [HttpGet("{id}")]

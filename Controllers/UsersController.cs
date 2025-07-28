@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+//using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using TrafficViolationsAPI.Data;
 using TrafficViolationsAPI.DTOs;
@@ -294,7 +296,61 @@ namespace TrafficViolationsAPI.Controllers
         //    // مؤقتًا: إعادة نوع مستخدم وهمي
         //    return "Admin"; // أو "TrafficOfficer" حسب ما تريد اختباره
         //}
+
+     
+
+        // POST: api/users/change-password
+        [HttpPost("change-password")]
+        [Authorize] //  تأكد من أن المستخدم مسجل دخوله
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                if (currentUserId == Guid.Empty)
+                {
+                    return Unauthorized(new { message = "جلسة المستخدم غير صالحة" });
+                }
+
+                var user = await _context.Users.FindAsync(currentUserId);
+                if (user == null)
+                {
+                    return NotFound(new { message = "المستخدم غير موجود" });
+                }
+
+                // 1. التحقق من أن كلمة المرور الحالية صحيحة
+                if (!BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, user.PasswordHash))
+                {
+                    return BadRequest(new { message = "كلمة المرور الحالية غير صحيحة" });
+                }
+
+                // 2. تحديث كلمة المرور بالهاش الجديد
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "تم تغيير كلمة المرور بنجاح" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "حدث خطأ أثناء تغيير كلمة المرور", error = ex.Message });
+            }
+        }
+
+        
+
     }
+
+    
+        public class ChangePasswordDto
+        {
+        [Required]
+        public  string OldPassword { get; set; }
+        [Required]
+        public  string NewPassword { get; set; }
+        }
+    
 
     public class UpdateUserDto
     {
